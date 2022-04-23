@@ -13,36 +13,44 @@ import {
   KeyboardAwareFlatList,
 } from 'react-native-keyboard-aware-scroll-view';
 
-const data = Array(50)
+const data = Array(40)
   .fill(0)
   .map((_, index) => `Event-${index}`);
 
 export default function BottomSheet() {
   return (
-    <View style={styles.container}>
-      <KeyboardAwareFlatList
-        style={{ flex: 1, width: '100%' }}
-        contentContainerStyle={{ width: '100%' }}
-        stickyHeaderIndices={[0]}
-        ListHeaderComponent={() => (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+      enabled={true}
+    >
+      <View style={styles.container}>
+        <KeyboardAwareScrollView
+          contentContainerStyle={{ flexGrow: 1, width: '100%', flex: 1 }}
+          style={{ backgroundColor: 'pink', width: '100%' }}
+          stickyHeaderIndices={[0]}
+          extraHeight={80}
+          enableAutomaticScroll={false}
+        >
           <View style={styles.header}>
             <Text style={styles.title}>Score</Text>
           </View>
-        )}
-        ListFooterComponent={() => (
+          <FlatList
+            style={{ flex: 1, width: '100%' }}
+            data={data}
+            keyExtractor={(i) => String(i)}
+            renderItem={({ item }) => (
+              <View style={styles.item}>
+                <Text>{item}</Text>
+              </View>
+            )}
+          />
           <View style={[styles.inputContainer, { paddingBottom: 20 }]}>
             <TextInput placeholder="Chat" style={styles.input} />
           </View>
-        )}
-        data={data}
-        keyExtractor={(i) => String(i)}
-        renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Text>{item}</Text>
-          </View>
-        )}
-      />
-    </View>
+        </KeyboardAwareScrollView>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 

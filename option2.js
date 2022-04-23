@@ -4,6 +4,7 @@ import BottomSheet, {
   BottomSheetView,
   BottomSheetFooter,
   BottomSheetFlatList,
+  useBottomSheetDynamicSnapPoints,
 } from '@gorhom/bottom-sheet';
 import {
   StyleSheet,
@@ -18,11 +19,18 @@ const { height } = Dimensions.get('window');
 
 export default function BottomSheet1() {
   const bottomSheetRef = useRef(null);
-  const snapPoints = useMemo(() => ['14%', '35%', '50%', '90%'], []);
+  const snapPoints = useMemo(() => [400], []);
+
+  const {
+    animatedHandleHeight,
+    animatedSnapPoints,
+    animatedContentHeight,
+    handleContentLayout,
+  } = useBottomSheetDynamicSnapPoints(snapPoints);
 
   const data = useMemo(
     () =>
-      Array(50)
+      Array(2)
         .fill(0)
         .map((_, index) => `Event-${index}`),
     []
@@ -92,27 +100,32 @@ export default function BottomSheet1() {
 
       <BottomSheet
         ref={bottomSheetRef}
-        index={1}
-        snapPoints={snapPoints}
+        snapPoints={animatedSnapPoints}
+        handleHeight={animatedHandleHeight}
+        contentHeight={animatedContentHeight}
+        // index={1}
         onChange={onSheetChange}
         enablePanDownToClose
         style={styles.bottomSheet}
         footerComponent={renderFooter}
-        keyboardBehavior="extend"
-        keyboardBlurBehavior={'restore'}
+        keyboardBehavior="interactive"
+        keyboardBlueBehaviour={'restore'}
+        shouldMeasureContentHeight={true}
       >
-        <View style={styles.bottomSheetHeader}>
-          <Text>Score</Text>
-        </View>
+        <BottomSheetView style={{ height: 400 }} onLayout={handleContentLayout}>
+          <View style={styles.bottomSheetHeader}>
+            <Text>Score</Text>
+          </View>
 
-        <BottomSheetFlatList
-          data={data}
-          keyExtractor={(i) => String(i)}
-          renderItem={renderItem}
-          contentContainerStyle={{
-            paddingVertical: 10,
-          }}
-        />
+          <BottomSheetFlatList
+            data={data}
+            keyExtractor={(i) => String(i)}
+            renderItem={renderItem}
+            contentContainerStyle={{
+              paddingVertical: 10,
+            }}
+          />
+        </BottomSheetView>
       </BottomSheet>
     </View>
   );
