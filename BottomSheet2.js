@@ -1,3 +1,4 @@
+import { useRef, useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,50 +7,46 @@ import {
   KeyboardAvoidingView,
   Platform,
   FlatList,
+  ScrollView,
 } from 'react-native';
+import useKeyboard from './useKeyboard';
 
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-
-const data = Array(40)
+const data = Array(20)
   .fill(0)
   .map((_, index) => `Event-${index}`);
 
 export default function BottomSheet() {
+  const { visible, keyboardHeight } = useKeyboard();
+
+  const flatListRef = useRef();
+
+  console.log({ keyboardHeight });
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
-      enabled={false}
+      enabled={true}
     >
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Score</Text>
-        </View>
-
-        <KeyboardAwareScrollView
-          contentContainerStyle={{ flexGrow: 1, width: '100%', flex: 1 }}
-          style={{ width: '100%' }}
-          extraHeight={160}
-          enableAutomaticScroll={true}
-          keyboardShouldPersistTaps="handled"
-          scrollEnabled={false}
-          nestedScrollEnabled={true}
-        >
-          <FlatList
-            style={{ flex: 1, width: '100%' }}
-            data={data}
-            keyExtractor={(i) => String(i)}
-            renderItem={({ item }) => (
-              <View style={styles.item}>
-                <Text>{item}</Text>
-              </View>
-            )}
-          />
-          <View style={[styles.inputContainer]}>
-            <TextInput placeholder="Chat" style={styles.input} />
-          </View>
-        </KeyboardAwareScrollView>
+      <View style={[styles.header]}>
+        <Text style={styles.title}>Score</Text>
       </View>
+      <ScrollView
+        style={{ width: '100%' }}
+        // contentContainerStyle={{ flexGrow: 1, flex: 1 }}
+        keyboardShouldPersistTaps="handled"
+        scrollEnabled={true}
+      >
+        {data.map((d, i) => (
+          <View style={styles.item}>
+            <Text>{d}</Text>
+          </View>
+        ))}
+
+        <View style={[styles.inputContainer]}>
+          <TextInput placeholder="Chat" style={styles.input} />
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
@@ -80,14 +77,14 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     width: '100%',
+    height: 80,
     backgroundColor: 'red',
-    marginBottom: 20,
     padding: 20,
+    marginTop: 'auto',
   },
   input: {
     backgroundColor: '#F3F2F5',
     padding: 10,
-    marginTop: 'auto',
   },
   item: {
     padding: 6,
