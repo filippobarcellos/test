@@ -20,6 +20,7 @@ export default function BottomSheet() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
       enabled={false}
+      //trocar aqui
     >
       <View style={styles.container}>
         <View style={styles.header}>
