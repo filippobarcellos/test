@@ -1,9 +1,7 @@
 import { useRef, useMemo, useCallback } from 'react';
 import BottomSheet, {
-  BottomSheetTextInput,
-  BottomSheetView,
-  BottomSheetFooter,
   BottomSheetFlatList,
+  BottomSheetView,
   useBottomSheetDynamicSnapPoints,
 } from '@gorhom/bottom-sheet';
 import {
@@ -13,28 +11,27 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import {
+  NativeViewGestureHandler,
+  FlatList,
+} from 'react-native-gesture-handler';
 
-const { height } = Dimensions.get('window');
+const MAX_HEIGHT = Dimensions.get('window').height;
+
+import CustomFooter from './CustomFooter';
 
 export default function BottomSheet1() {
   const bottomSheetRef = useRef(null);
-  const snapPoints = useMemo(() => [400], []);
-
-  const {
-    animatedHandleHeight,
-    animatedSnapPoints,
-    animatedContentHeight,
-    handleContentLayout,
-  } = useBottomSheetDynamicSnapPoints(snapPoints);
+  const snapPoints = useMemo(() => ['14%', '35%', '50%', '90%'], []);
+  // const [inputBlur, setInputBlur] = useState(false);
 
   const data = useMemo(
     () =>
-      Array(2)
+      Array(50)
         .fill(0)
         .map((_, index) => `Event-${index}`),
     []
-  );
+  ).reverse();
 
   const onSheetChange = (index) => {
     console.log({ index });
@@ -61,28 +58,16 @@ export default function BottomSheet1() {
     []
   );
 
-  const renderFooter = useCallback(
-    (props) => (
-      <BottomSheetFooter
-        {...props}
-        bottomInset={2}
-        style={{ backgroundColor: 'white' }}
-      >
-        <View style={styles.inputContainer}>
-          <BottomSheetTextInput
-            placeholder="Chat to the Circl"
-            style={styles.input}
-          />
-        </View>
-      </BottomSheetFooter>
-    ),
-    []
-  );
+  // useEffect(() => {
+  //   if (inputBlur) {
+  //     bottomSheetRef.current.snapToIndex(1);
+  //   }
+  // }, [inputBlur]);
 
   return (
-    <View style={[styles.container, height]}>
+    <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Circl</Text>
+        <Text style={styles.title}>App</Text>
       </View>
 
       <View style={styles.buttons}>
@@ -100,31 +85,32 @@ export default function BottomSheet1() {
 
       <BottomSheet
         ref={bottomSheetRef}
-        snapPoints={animatedSnapPoints}
-        handleHeight={animatedHandleHeight}
-        contentHeight={animatedContentHeight}
-        // index={1}
+        index={1}
+        snapPoints={snapPoints}
         onChange={onSheetChange}
         enablePanDownToClose
-        style={styles.bottomSheet}
-        footerComponent={renderFooter}
-        keyboardBehavior="interactive"
-        keyboardBlueBehaviour={'restore'}
-        shouldMeasureContentHeight={true}
+        style={[styles.bottomSheet]}
+        footerComponent={CustomFooter}
+        keyboardBehavior="extend"
+        keyboardBlurBehavior={'restore'}
       >
-        <BottomSheetView style={{ height: 400 }} onLayout={handleContentLayout}>
+        <BottomSheetView style={{ height: '100%' }}>
           <View style={styles.bottomSheetHeader}>
             <Text>Score</Text>
           </View>
 
-          <BottomSheetFlatList
-            data={data}
-            keyExtractor={(i) => String(i)}
-            renderItem={renderItem}
-            contentContainerStyle={{
-              paddingVertical: 10,
-            }}
-          />
+          <View style={{ height: '100%' }}>
+            <FlatList
+              data={data}
+              keyExtractor={(i) => String(i)}
+              renderItem={renderItem}
+              inverted
+              style={{ marginBottom: 80 }}
+              contentContainerStyle={{
+                paddingTop: 40,
+              }}
+            />
+          </View>
         </BottomSheetView>
       </BottomSheet>
     </View>
@@ -150,17 +136,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     paddingTop: 20,
   },
-  inputContainer: {
-    width: '100%',
-    height: 80,
-    marginTop: 'auto',
-    marginBottom: 20,
-    padding: 20,
-  },
-  input: {
-    backgroundColor: '#F3F2F5',
-    padding: 10,
-  },
   buttons: {
     marginTop: 40,
     flexDirection: 'row',
@@ -173,7 +148,6 @@ const styles = StyleSheet.create({
   },
   bottomSheet: {
     paddingVertical: 20,
-    flex: 1,
   },
   bottomSheetHeader: {
     width: '100%',
@@ -191,3 +165,32 @@ const styles = StyleSheet.create({
     backgroundColor: '#eee',
   },
 });
+
+{
+  /* <BottomSheet
+          ref={bottomSheetRef}
+          index={1}
+          snapPoints={snapPoints}
+          onChange={onSheetChange}
+          enablePanDownToClose
+          style={styles.bottomSheet}
+          footerComponent={CustomFooter}
+          keyboardBehavior="extend"
+          keyboardBlurBehavior="restore"
+        >
+          <View style={styles.bottomSheetHeader}>
+            <Text>Score</Text>
+          </View>
+
+          <FlatList
+            data={data}
+            keyExtractor={(i) => String(i)}
+            renderItem={renderItem}
+            inverted
+            style={{ marginBottom: 20 }}
+            contentContainerStyle={{
+              paddingTop: 10,
+            }}
+          />
+        </BottomSheet> */
+}

@@ -8,9 +8,12 @@ import {
   FlatList,
 } from 'react-native';
 
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import {
+  KeyboardAwareScrollView,
+  KeyboardAwareFlatList,
+} from 'react-native-keyboard-aware-scroll-view';
 
-const data = Array(40)
+const data = Array(20)
   .fill(0)
   .map((_, index) => `Event-${index}`);
 
@@ -18,7 +21,7 @@ export default function BottomSheet() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
+      style={[styles.container]}
       enabled={false}
       //trocar aqui
     >
@@ -26,14 +29,13 @@ export default function BottomSheet() {
         <View style={styles.header}>
           <Text style={styles.title}>Score</Text>
         </View>
-
         <KeyboardAwareScrollView
           contentContainerStyle={{ flexGrow: 1, width: '100%', flex: 1 }}
           style={{ width: '100%' }}
-          extraHeight={160}
+          extraHeight={180}
           enableAutomaticScroll={true}
           keyboardShouldPersistTaps="handled"
-          scrollEnabled={false}
+          scrollEnabled={true}
           nestedScrollEnabled={true}
         >
           <FlatList
@@ -58,7 +60,7 @@ export default function BottomSheet() {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    height: 800,
+    height: 600,
     backgroundColor: 'white',
     alignItems: 'center',
     marginTop: 'auto',

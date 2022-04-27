@@ -1,7 +1,6 @@
-import { useRef, useMemo, useCallback } from 'react';
+import { useRef, useMemo, useCallback, useState, useEffect } from 'react';
 import BottomSheet, {
   BottomSheetTextInput,
-  BottomSheetView,
   BottomSheetFooter,
   BottomSheetFlatList,
 } from '@gorhom/bottom-sheet';
@@ -12,13 +11,19 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import {
+  NativeViewGestureHandler,
+  FlatList,
+} from 'react-native-gesture-handler';
 
 const { height } = Dimensions.get('window');
 
 export default function BottomSheet1() {
   const bottomSheetRef = useRef(null);
+  const flatListRef = useRef();
   const snapPoints = useMemo(() => ['14%', '35%', '50%', '90%'], []);
+  const [focus, setFocus] = useState(false);
+  const [height, setHeight] = useState('100%');
 
   const data = useMemo(
     () =>
@@ -63,6 +68,8 @@ export default function BottomSheet1() {
         <View style={styles.inputContainer}>
           <BottomSheetTextInput
             placeholder="Chat to the Circl"
+            onFocus={() => setFocus(true)}
+            onBlur={() => setFocus(false)}
             style={styles.input}
           />
         </View>
@@ -71,50 +78,64 @@ export default function BottomSheet1() {
     []
   );
 
+  useEffect(() => {
+    if (focus) {
+      setHeight(346);
+      flatListRef.current.scrollToEnd();
+    } else {
+      setHeight('100%');
+    }
+  }, [focus]);
+
   return (
-    <View style={[styles.container, height]}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Circl</Text>
-      </View>
-
-      <View style={styles.buttons}>
-        <TouchableOpacity onPress={onSheetOpen} style={styles.button}>
-          <Text>Expand</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={onSheetCollapse} style={styles.button}>
-          <Text>Collapse</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={onSheetClose} style={styles.button}>
-          <Text>Close</Text>
-        </TouchableOpacity>
-      </View>
-
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={1}
-        snapPoints={snapPoints}
-        onChange={onSheetChange}
-        enablePanDownToClose
-        style={styles.bottomSheet}
-        footerComponent={renderFooter}
-        keyboardBehavior="extend"
-        keyboardBlurBehavior={'restore'}
-      >
-        <View style={styles.bottomSheetHeader}>
-          <Text>Score</Text>
+    <NativeViewGestureHandler disallowInterruption={true}>
+      <View style={[styles.container]}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Circl</Text>
         </View>
 
-        <BottomSheetFlatList
-          data={data}
-          keyExtractor={(i) => String(i)}
-          renderItem={renderItem}
-          contentContainerStyle={{
-            paddingVertical: 10,
-          }}
-        />
-      </BottomSheet>
-    </View>
+        <View style={styles.buttons}>
+          <TouchableOpacity onPress={onSheetOpen} style={styles.button}>
+            <Text>Expand</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={onSheetCollapse} style={styles.button}>
+            <Text>Collapse</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onSheetClose} style={styles.button}>
+            <Text>Close</Text>
+          </TouchableOpacity>
+        </View>
+
+        <BottomSheet
+          ref={bottomSheetRef}
+          index={1}
+          snapPoints={snapPoints}
+          onChange={onSheetChange}
+          enablePanDownToClose
+          style={styles.bottomSheet}
+          footerComponent={renderFooter}
+          keyboardBehavior="extend"
+          keyboardBlurBehavior={'restore'}
+        >
+          <View style={styles.bottomSheetHeader}>
+            <Text>Score</Text>
+          </View>
+
+          <View style={{ backgroundColor: 'red', height: 346 }}>
+            <FlatList
+              ref={flatListRef}
+              data={data}
+              keyExtractor={(i) => String(i)}
+              renderItem={renderItem}
+              contentContainerStyle={{
+                paddingVertical: 10,
+              }}
+            />
+          </View>
+        </BottomSheet>
+      </View>
+    </NativeViewGestureHandler>
   );
 }
 
