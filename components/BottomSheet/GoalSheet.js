@@ -1,18 +1,24 @@
-import { useRef } from 'react';
+import { useRef, useImperativeHandle, forwardRef } from 'react';
 import BottomSheet from 'react-native-bottomsheet-reanimated';
 
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 
 const SNAP_POINTS = ['0%', '60%', '80%'];
 
-export default function GoalSheet() {
-  const sheetRef = useRef();
+const GoalSheet = forwardRef(({ onExpand }, ref) => {
+  const bottomSheetRef = useRef(null);
+
+  useImperativeHandle(ref, () => ({
+    expand: () => bottomSheetRef.current.snapTo(2),
+    collapse: () => bottomSheetRef.current.snapTo(1),
+    close: () => bottomSheetRef.current.snapTo(0),
+  }));
 
   return (
     <BottomSheet
       keyboardAware={false}
       bottomSheerColor="#FFFFFF"
-      ref={sheetRef}
+      ref={bottomSheetRef}
       initialPosition={'60%'}
       snapPoints={SNAP_POINTS}
       containerStyle={{
@@ -26,14 +32,14 @@ export default function GoalSheet() {
       body={
         <View style={styles.container}>
           <Text>Goal Sheet</Text>
-          <TouchableOpacity onPress={() => console.log('clicou')}>
+          <TouchableOpacity onPress={onExpand}>
             <Text>Open</Text>
           </TouchableOpacity>
         </View>
       }
     />
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -43,3 +49,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+
+export default GoalSheet;

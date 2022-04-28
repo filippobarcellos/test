@@ -33,6 +33,10 @@ export default function App() {
   //   preferencesSheetRef.current.close();
   // };
 
+  const onGoalSheetOpen = () => {
+    goalSheetRef.current.expand();
+  };
+
   return (
     <SafeAreaProvider>
       <View style={styles.container}>
@@ -42,6 +46,7 @@ export default function App() {
       </View>
       <GoalSheet
         ref={goalSheetRef}
+        onExpand={onGoalSheetOpen}
         // onOpen={onGoalSheetOpen}
         // onClose={onGoalSheetClose}
       />
