@@ -1,29 +1,48 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import BottomSheet from 'react-native-bottomsheet-reanimated';
+import { KeyboardScrollView } from 'react-native-avoiding-keyboard-scroll-view';
 
-import { StyleSheet, Text, View, TextInput, FlatList } from 'react-native';
+import { StyleSheet, Text, View, TextInput, ScrollView } from 'react-native';
 
-import {
-  KeyboardAwareScrollView,
-  KeyboardAwareFlatList,
-  KeyboardAwareView,
-} from 'react-native-keyboard-aware-scroll-view';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-const data = Array(40)
+const data = Array(20)
   .fill(0)
   .map((_, index) => `Event-${index}`);
 
+const SNAP_POINTS = ['0%', '12', '25%', '50%', '80%'];
+
 export default function BottomSheet1() {
   const sheetRef = useRef();
+  const [avoidNative, setAvoidNative] = useState(true);
+
+  // function onSnapChange(index) {
+  //   sheetRef?.current.snapTo(index);
+  // }
+
+  // imperative handle collape close
+
+  function onClose() {
+    sheetRef?.current.dismissBottomSheet();
+  }
+
+  function onSnapChange(data) {
+    setAvoidNative(data.index === 4 ? false : true);
+  }
 
   return (
     <BottomSheet
-      keyboardAware={false} // change here
+      keyboardAware={avoidNative} // change here
       bottomSheerColor="#FFFFFF"
       ref={sheetRef}
-      initialPosition={'50%'} //200, 300
-      snapPoints={['50%', '80%']}
-      onChangeSnap={(data) => console.log(data)}
+      initialPosition={'50%'}
+      onChangeSnap={onSnapChange}
+      snapPoints={SNAP_POINTS}
+      containerStyle={{
+        borderRadius: 40,
+        borderTopLeftRadius: 12,
+        shadowColor: '#FFFFFF',
+      }}
       isBackDrop={false}
       isBackDropDismissByPress={true}
       isRoundBorderWithTipHeader={true}
@@ -33,33 +52,20 @@ export default function BottomSheet1() {
         </View>
       }
       body={
-        <KeyboardAwareView>
-          <KeyboardAwareFlatList
-            contentContainerStyle={{
-              width: '100%',
-              flexGrow: 1,
-              justifyContent: 'space-between',
-            }}
-            style={{ width: '100%' }}
-            extraHeight={260}
-            keyboardAwareExtraSnapHeight={100}
-            enableAutomaticScroll={true} // change here
-            // keyboardShouldPersistTaps="handled"
-            scrollEnabled={true}
-            data={data}
-            keyExtractor={(index) => String(index)}
-            ListFooterComponent={
-              <View style={[styles.inputContainer]}>
-                <TextInput placeholder="Chat" style={styles.input} />
-              </View>
-            }
-            renderItem={({ item }) => (
-              <View style={styles.item}>
-                <Text>{item}</Text>
-              </View>
-            )}
-          />
-        </KeyboardAwareView>
+        <KeyboardScrollView
+          keyboardViewOffset={30}
+          renderBottomComponent={() => (
+            <View style={[styles.inputContainer]}>
+              <TextInput placeholder="Chat" style={styles.input} />
+            </View>
+          )}
+        >
+          {data.map((e) => (
+            <View style={styles.item} key={e}>
+              <Text>{e}</Text>
+            </View>
+          ))}
+        </KeyboardScrollView>
       }
     />
   );
@@ -87,9 +93,11 @@ const styles = StyleSheet.create({
   inputContainer: {
     width: '100%',
     backgroundColor: 'red',
-    marginBottom: 20,
+    marginBottom: 0,
     padding: 20,
-    marginTop: 'auto',
+    paddingBottom: 50,
+    position: 'absolute',
+    bottom: 0,
   },
   input: {
     backgroundColor: '#F3F2F5',
@@ -102,8 +110,3 @@ const styles = StyleSheet.create({
     backgroundColor: '#eee',
   },
 });
-
-//scroll view
-// stickyHeaderIndices={[0]}
-//           // invertStickyHeaders={true}
-//           inverted

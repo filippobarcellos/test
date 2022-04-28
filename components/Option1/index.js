@@ -1,52 +1,53 @@
-import { useRef, useMemo, useCallback } from 'react';
+import { useRef, useMemo, useCallback, forwardRef, useState } from 'react';
 import BottomSheet, {
-  BottomSheetFlatList,
   BottomSheetView,
-  useBottomSheetDynamicSnapPoints,
+  useBottomSheet,
 } from '@gorhom/bottom-sheet';
+import { StyleSheet, Text, View, Dimensions } from 'react-native';
+import { ScrollView, FlatList } from 'react-native-gesture-handler';
 import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
-import {
-  NativeViewGestureHandler,
-  FlatList,
-} from 'react-native-gesture-handler';
+  useAnimatedStyle,
+  interpolate,
+  Extrapolate,
+  useSharedValue,
+} from 'react-native-reanimated';
+
+const data = Array(20)
+  .fill(0)
+  .map((_, index) => `Event-${index}`)
+  .reverse();
 
 const MAX_HEIGHT = Dimensions.get('window').height;
 
 import CustomFooter from './CustomFooter';
 
-export default function BottomSheet1() {
-  const bottomSheetRef = useRef(null);
+const CustomView = ({ children }) => {
+  const { animatedIndex } = useBottomSheet();
+
+  const containerAnimatedStyle = useAnimatedStyle(
+    () => ({
+      maxHeight: (animatedIndex.value * MAX_HEIGHT) / 4.2,
+    }),
+    [animatedIndex]
+  );
+
+  return (
+    <BottomSheetView
+      style={[{ backgroundColor: 'red', flexGrow: 1 }, containerAnimatedStyle]}
+    >
+      {children}
+    </BottomSheetView>
+  );
+};
+
+const ChatSheet = forwardRef(({ onPreferencesOpen }, ref) => {
   const snapPoints = useMemo(() => ['14%', '35%', '50%', '90%'], []);
   // const [inputBlur, setInputBlur] = useState(false);
 
-  const data = useMemo(
-    () =>
-      Array(50)
-        .fill(0)
-        .map((_, index) => `Event-${index}`),
-    []
-  ).reverse();
-
   const onSheetChange = (index) => {
-    console.log({ index });
-  };
-
-  const onSheetOpen = () => {
-    bottomSheetRef.current.snapToIndex(2);
-  };
-
-  const onSheetCollapse = () => {
-    bottomSheetRef.current.collapse();
-  };
-
-  const onSheetClose = () => {
-    bottomSheetRef.current.close();
+    // index 3 - 85%
+    // index 2 - 45%
+    // index 1 - 25%
   };
 
   const renderItem = useCallback(
@@ -58,94 +59,39 @@ export default function BottomSheet1() {
     []
   );
 
-  // useEffect(() => {
-  //   if (inputBlur) {
-  //     bottomSheetRef.current.snapToIndex(1);
-  //   }
-  // }, [inputBlur]);
-
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>App</Text>
-      </View>
+    <BottomSheet
+      ref={ref}
+      index={1}
+      snapPoints={snapPoints}
+      onChange={onSheetChange}
+      enablePanDownToClose
+      style={[styles.bottomSheet]}
+      footerComponent={CustomFooter}
+      keyboardBehavior="extend"
+      keyboardBlurBehavior={'restore'}
+    >
+      <CustomView>
+        <View style={styles.bottomSheetHeader}>
+          <Text>Score</Text>
+        </View>
 
-      <View style={styles.buttons}>
-        <TouchableOpacity onPress={onSheetOpen} style={styles.button}>
-          <Text>Expand</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={onSheetCollapse} style={styles.button}>
-          <Text>Collapse</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={onSheetClose} style={styles.button}>
-          <Text>Close</Text>
-        </TouchableOpacity>
-      </View>
-
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={1}
-        snapPoints={snapPoints}
-        onChange={onSheetChange}
-        enablePanDownToClose
-        style={[styles.bottomSheet]}
-        footerComponent={CustomFooter}
-        keyboardBehavior="extend"
-        keyboardBlurBehavior={'restore'}
-      >
-        <BottomSheetView style={{ height: '100%' }}>
-          <View style={styles.bottomSheetHeader}>
-            <Text>Score</Text>
-          </View>
-
-          <View style={{ height: '100%' }}>
-            <FlatList
-              data={data}
-              keyExtractor={(i) => String(i)}
-              renderItem={renderItem}
-              inverted
-              style={{ marginBottom: 80 }}
-              contentContainerStyle={{
-                paddingTop: 40,
-              }}
-            />
-          </View>
-        </BottomSheetView>
-      </BottomSheet>
-    </View>
+        <FlatList
+          data={data}
+          keyExtractor={(i) => String(i)}
+          renderItem={renderItem}
+          style={{ flexGrow: 1 }}
+          inverted
+          contentContainerStyle={{
+            paddingTop: 40,
+          }}
+        />
+      </CustomView>
+    </BottomSheet>
   );
-}
+});
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#020018',
-    alignItems: 'center',
-  },
-  header: {
-    width: '100%',
-    backgroundColor: '#012BF6',
-    paddingVertical: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-    paddingTop: 20,
-  },
-  buttons: {
-    marginTop: 40,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  button: {
-    padding: 10,
-    backgroundColor: '#FFBD13',
-    marginRight: 10,
-  },
   bottomSheet: {
     paddingVertical: 20,
   },
@@ -165,6 +111,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#eee',
   },
 });
+
+export default ChatSheet;
 
 {
   /* <BottomSheet

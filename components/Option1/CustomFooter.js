@@ -26,7 +26,7 @@ const CustomFooter = ({ animatedFooterPosition }) => {
   const containerAnimatedStyle = useAnimatedStyle(
     () => ({
       opacity: interpolate(
-        animatedIndex.value - 0.9,
+        animatedIndex.value,
         [0.4, 1],
         [0, 1],
         Extrapolate.CLAMP
@@ -53,7 +53,7 @@ const CustomFooter = ({ animatedFooterPosition }) => {
   return (
     <BottomSheetFooter
       // we pass the bottom safe inset
-      bottomInset={bottomSafeArea}
+      // bottomInset={bottomSafeArea}
       // we pass the provided `animatedFooterPosition`
       animatedFooterPosition={animatedFooterPosition}
     >
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     justifyContent: 'center',
     paddingHorizontal: 12,
-    // marginBottom: 12,
+    marginBottom: 20,
     width: '100%',
     height: 80,
     backgroundColor: '#80f',

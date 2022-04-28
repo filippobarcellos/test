@@ -9,7 +9,7 @@ const data = Array(20)
   .fill(0)
   .map((_, index) => `Event-${index}`);
 
-const SNAP_POINTS = ['0%', '25%', '50%', '80%'];
+const SNAP_POINTS = ['0%', '12', '25%', '50%', '80%'];
 
 export default function BottomSheet1() {
   const sheetRef = useRef();
@@ -26,7 +26,7 @@ export default function BottomSheet1() {
   }
 
   function onSnapChange(data) {
-    setAvoidNative(data.index === 3 ? false : true);
+    setAvoidNative(data.index === 4 ? false : true);
   }
 
   return (
@@ -37,8 +37,14 @@ export default function BottomSheet1() {
       initialPosition={'50%'}
       onChangeSnap={onSnapChange}
       snapPoints={SNAP_POINTS}
+      // isModal
+      containerStyle={{
+        borderRadius: 40,
+        borderTopLeftRadius: 12,
+        shadowColor: '#FFFFFF',
+      }}
       isBackDrop={false}
-      isBackDropDismissByPress={true}
+      isBackDropDismissByPress={false}
       isRoundBorderWithTipHeader={true}
       header={
         <View style={styles.header}>
@@ -51,7 +57,7 @@ export default function BottomSheet1() {
           extraHeight={260}
           keyboardOpeningTime={0}
           // keyboardAwareExtraSnapHeight={100}
-          enableAutomaticScroll={!avoidNative} // change here
+          enableAutomaticScroll={false} // change here
           keyboardShouldPersistTaps="handled"
           scrollEnabled={false}
         >
